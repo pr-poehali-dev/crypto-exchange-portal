@@ -11,6 +11,7 @@ const cryptoData = [
   { symbol: 'RAPH', name: 'RaphToken', price: 1.00, change: 0.01, amount: 5000 },
   { symbol: 'DONY', name: 'DonyMoney', price: 312.80, change: 3.21, amount: 2.5 },
   { symbol: 'MKKY', name: 'MikkyToken', price: 98.50, change: -2.15, amount: 10 },
+  { symbol: 'DNYA', name: 'DanyaKazyk', price: 8061.20, change: 4.87, amount: 1.5 },
 ];
 
 const getRandomBalance = () => {
@@ -21,6 +22,7 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('main');
   const [exchangeAmount, setExchangeAmount] = useState('');
   const [totalBalance, setTotalBalance] = useState(0);
+  const [showDevelopers, setShowDevelopers] = useState(false);
   const { toast } = useToast();
   const balanceChange = 6.18;
 
@@ -331,6 +333,49 @@ export default function Index() {
                     <Icon name="ChevronRight" size={20} className="text-gray-400" />
                   </div>
                 </Card>
+
+                <Card 
+                  className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer"
+                  onClick={() => setShowDevelopers(!showDevelopers)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Icon name="Code" size={20} className="text-primary" />
+                      </div>
+                      <span className="text-white font-medium">Разработчики</span>
+                    </div>
+                    <Icon name={showDevelopers ? "ChevronDown" : "ChevronRight"} size={20} className="text-gray-400" />
+                  </div>
+                </Card>
+
+                {showDevelopers && (
+                  <div className="space-y-2 ml-4">
+                    <Card className="bg-secondary/50 border-border p-4 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">DK</span>
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">DanyaKazyk</div>
+                          <div className="text-sm text-gray-400">Lead Developer</div>
+                        </div>
+                      </div>
+                    </Card>
+
+                    <Card className="bg-secondary/50 border-border p-4 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">MK</span>
+                        </div>
+                        <div>
+                          <div className="text-white font-medium">MironkaKartonka</div>
+                          <div className="text-sm text-gray-400">Senior Developer</div>
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                )}
               </div>
             </div>
           )}
