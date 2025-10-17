@@ -61,10 +61,10 @@ export default function Index() {
             </Button>
           </div>
 
-          <div className="flex gap-2 mb-8 bg-secondary/50 p-1 rounded-2xl">
+          <div className="flex gap-1 mb-8 bg-secondary/50 p-1 rounded-2xl">
             <button
               onClick={() => setActiveTab('main')}
-              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+              className={`flex-1 py-2.5 px-2 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'main'
                   ? 'bg-primary text-white shadow-lg shadow-primary/30'
                   : 'text-gray-400 hover:text-gray-300'
@@ -74,7 +74,7 @@ export default function Index() {
             </button>
             <button
               onClick={() => setActiveTab('markets')}
-              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+              className={`flex-1 py-2.5 px-2 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'markets'
                   ? 'bg-primary text-white shadow-lg shadow-primary/30'
                   : 'text-gray-400 hover:text-gray-300'
@@ -84,7 +84,7 @@ export default function Index() {
             </button>
             <button
               onClick={() => setActiveTab('exchange')}
-              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+              className={`flex-1 py-2.5 px-2 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'exchange'
                   ? 'bg-primary text-white shadow-lg shadow-primary/30'
                   : 'text-gray-400 hover:text-gray-300'
@@ -94,7 +94,7 @@ export default function Index() {
             </button>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex-1 py-3 px-4 rounded-xl font-medium transition-all ${
+              className={`flex-1 py-2.5 px-2 rounded-xl font-medium text-sm transition-all ${
                 activeTab === 'profile'
                   ? 'bg-primary text-white shadow-lg shadow-primary/30'
                   : 'text-gray-400 hover:text-gray-300'
