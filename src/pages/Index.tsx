@@ -224,7 +224,7 @@ export default function Index() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-semibold text-white">$43 250,50</div>
+                          <div className="font-semibold text-white">$2 280,30</div>
                           <div className={`text-sm ${crypto.change >= 0 ? 'text-primary' : 'text-red-400'}`}>
                             {crypto.change >= 0 ? '+' : ''}{crypto.change}%
                           </div>
