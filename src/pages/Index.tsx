@@ -4,15 +4,13 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
-const cryptoData = [
-  { symbol: 'SHRD', name: 'ShredorCoin', price: 43250.50, change: 2.45, amount: 0.15 },
-  { symbol: 'TRT', name: 'TortleMoney', price: 2280.30, change: -1.23, amount: 0.5 },
-  { symbol: 'LEO', name: 'LeoCoin', price: 2.45, change: 5.67, amount: 1250 },
-  { symbol: 'RAPH', name: 'RaphToken', price: 1.00, change: 0.01, amount: 5000 },
-  { symbol: 'DONY', name: 'DonyMoney', price: 312.80, change: 3.21, amount: 2.5 },
-  { symbol: 'MKKY', name: 'MikkyToken', price: 98.50, change: -2.15, amount: 10 },
-  { symbol: 'DNYA', name: 'DanyaKazyk', price: 8061.20, change: 4.87, amount: 1.5 },
-];
+interface CryptoType {
+  symbol: string;
+  name: string;
+  price: number;
+  change: number;
+  amount: number;
+}
 
 const getRandomBalance = () => {
   return (Math.random() * (19482.49 - 1583.49) + 1583.49);
@@ -23,6 +21,19 @@ export default function Index() {
   const [exchangeAmount, setExchangeAmount] = useState('');
   const [totalBalance, setTotalBalance] = useState(0);
   const [showDevelopers, setShowDevelopers] = useState(false);
+  const [fromCrypto, setFromCrypto] = useState('SHRD');
+  const [toCrypto, setToCrypto] = useState('TRT');
+  const [showFromSelect, setShowFromSelect] = useState(false);
+  const [showToSelect, setShowToSelect] = useState(false);
+  const [cryptoData, setCryptoData] = useState<CryptoType[]>([
+    { symbol: 'SHRD', name: 'ShredorCoin', price: 43250.50, change: 2.45, amount: 0.15 },
+    { symbol: 'TRT', name: 'TortleMoney', price: 2280.30, change: -1.23, amount: 0.5 },
+    { symbol: 'LEO', name: 'LeoCoin', price: 2.45, change: 5.67, amount: 1250 },
+    { symbol: 'RAPH', name: 'RaphToken', price: 1.00, change: 0.01, amount: 5000 },
+    { symbol: 'DONY', name: 'DonyMoney', price: 312.80, change: 3.21, amount: 2.5 },
+    { symbol: 'MKKY', name: 'MikkyToken', price: 98.50, change: -2.15, amount: 10 },
+    { symbol: 'DNYA', name: 'DanyaKazyk', price: 8061.20, change: 4.87, amount: 1.5 },
+  ]);
   const { toast } = useToast();
   const balanceChange = 6.18;
 
@@ -41,9 +52,37 @@ export default function Index() {
   const handleExchange = () => {
     if (!exchangeAmount || parseFloat(exchangeAmount) <= 0) return;
     
+    const fromCoin = cryptoData.find(c => c.symbol === fromCrypto);
+    const toCoin = cryptoData.find(c => c.symbol === toCrypto);
+    
+    if (!fromCoin || !toCoin) return;
+    
+    const amount = parseFloat(exchangeAmount);
+    if (amount > fromCoin.amount) {
+      toast({
+        title: '❌ Недостаточно средств',
+        description: `У вас только ${fromCoin.amount} ${fromCoin.symbol}`,
+        duration: 3000,
+      });
+      return;
+    }
+    
+    const rate = fromCoin.price / toCoin.price;
+    const receivedAmount = amount * rate;
+    
+    setCryptoData(prev => prev.map(coin => {
+      if (coin.symbol === fromCrypto) {
+        return { ...coin, amount: coin.amount - amount };
+      }
+      if (coin.symbol === toCrypto) {
+        return { ...coin, amount: coin.amount + receivedAmount };
+      }
+      return coin;
+    }));
+    
     toast({
       title: '✅ Обмен выполнен!',
-      description: `Вы обменяли ${exchangeAmount} BTC на ${(parseFloat(exchangeAmount) * 18.9).toFixed(4)} ETH`,
+      description: `Вы обменяли ${amount} ${fromCrypto} на ${receivedAmount.toFixed(4)} ${toCrypto}`,
       duration: 3000,
     });
     setExchangeAmount('');
@@ -139,15 +178,24 @@ export default function Index() {
               </Card>
 
               <div className="grid grid-cols-2 gap-3">
-                <Button className="h-auto py-6 bg-secondary hover:bg-secondary/80 border border-border rounded-2xl flex flex-col items-center gap-2">
+                <Button 
+                  onClick={() => handleInProgress('Отправить')}
+                  className="h-auto py-6 bg-secondary hover:bg-secondary/80 border border-border rounded-2xl flex flex-col items-center gap-2"
+                >
                   <Icon name="ArrowUp" size={24} className="text-gray-400" />
                   <span className="text-gray-300 font-medium">Отправить</span>
                 </Button>
-                <Button className="h-auto py-6 bg-secondary hover:bg-secondary/80 border border-border rounded-2xl flex flex-col items-center gap-2">
+                <Button 
+                  onClick={() => handleInProgress('Получить')}
+                  className="h-auto py-6 bg-secondary hover:bg-secondary/80 border border-border rounded-2xl flex flex-col items-center gap-2"
+                >
                   <Icon name="ArrowDown" size={24} className="text-gray-400" />
                   <span className="text-gray-300 font-medium">Получить</span>
                 </Button>
-                <Button className="h-auto py-6 bg-primary hover:bg-primary/90 rounded-2xl flex flex-col items-center gap-2 shadow-lg shadow-primary/30">
+                <Button 
+                  onClick={() => setActiveTab('exchange')}
+                  className="h-auto py-6 bg-primary hover:bg-primary/90 rounded-2xl flex flex-col items-center gap-2 shadow-lg shadow-primary/30"
+                >
                   <Icon name="ArrowLeftRight" size={24} className="text-white" />
                   <span className="text-white font-medium">Обменять</span>
                 </Button>
@@ -232,7 +280,7 @@ export default function Index() {
               <h2 className="text-2xl font-bold text-white">Обмен криптовалюты</h2>
 
               <div className="space-y-4">
-                <Card className="bg-card border-border p-5 rounded-2xl">
+                <Card className="bg-card border-border p-5 rounded-2xl relative">
                   <div className="text-sm text-gray-400 mb-3">Вы отдаёте</div>
                   <div className="flex items-center justify-between mb-3">
                     <input
@@ -242,14 +290,44 @@ export default function Index() {
                       placeholder="0.00"
                       className="bg-transparent text-3xl font-bold outline-none w-full text-white"
                     />
-                    <Button variant="outline" className="rounded-full border-border bg-secondary hover:bg-secondary/80 text-white">
-                      BTC
+                    <Button 
+                      variant="outline" 
+                      className="rounded-full border-border bg-secondary hover:bg-secondary/80 text-white"
+                      onClick={() => setShowFromSelect(!showFromSelect)}
+                    >
+                      {fromCrypto}
                       <Icon name="ChevronDown" size={16} className="ml-2" />
                     </Button>
                   </div>
                   <div className="text-sm text-gray-400">
-                    Доступно: 0.15 BTC
+                    Доступно: {cryptoData.find(c => c.symbol === fromCrypto)?.amount || 0} {fromCrypto}
                   </div>
+                  
+                  {showFromSelect && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl p-2 z-10 max-h-60 overflow-y-auto">
+                      {cryptoData.filter(c => c.symbol !== toCrypto).map((crypto) => (
+                        <button
+                          key={crypto.symbol}
+                          onClick={() => {
+                            setFromCrypto(crypto.symbol);
+                            setShowFromSelect(false);
+                          }}
+                          className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 rounded-xl transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-purple-900/30 flex items-center justify-center">
+                              <span className="text-sm font-bold text-primary">{crypto.symbol[0]}</span>
+                            </div>
+                            <div className="text-left">
+                              <div className="text-white font-medium text-sm">{crypto.name}</div>
+                              <div className="text-gray-400 text-xs">{crypto.amount} {crypto.symbol}</div>
+                            </div>
+                          </div>
+                          <div className="text-white text-sm">${crypto.price.toLocaleString()}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </Card>
 
                 <div className="flex justify-center">
@@ -258,20 +336,56 @@ export default function Index() {
                   </button>
                 </div>
 
-                <Card className="bg-card border-border p-5 rounded-2xl">
+                <Card className="bg-card border-border p-5 rounded-2xl relative">
                   <div className="text-sm text-gray-400 mb-3">Вы получаете</div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="text-3xl font-bold text-white">
-                      {exchangeAmount ? (parseFloat(exchangeAmount) * 18.9).toFixed(4) : '0.00'}
+                      {exchangeAmount && cryptoData.find(c => c.symbol === fromCrypto) && cryptoData.find(c => c.symbol === toCrypto) ? 
+                        (parseFloat(exchangeAmount) * (cryptoData.find(c => c.symbol === fromCrypto)!.price / cryptoData.find(c => c.symbol === toCrypto)!.price)).toFixed(4) : 
+                        '0.00'
+                      }
                     </div>
-                    <Button variant="outline" className="rounded-full border-border bg-secondary hover:bg-secondary/80 text-white">
-                      ETH
+                    <Button 
+                      variant="outline" 
+                      className="rounded-full border-border bg-secondary hover:bg-secondary/80 text-white"
+                      onClick={() => setShowToSelect(!showToSelect)}
+                    >
+                      {toCrypto}
                       <Icon name="ChevronDown" size={16} className="ml-2" />
                     </Button>
                   </div>
                   <div className="text-sm text-gray-400">
-                    1 BTC ≈ 18.9 ETH
+                    1 {fromCrypto} ≈ {cryptoData.find(c => c.symbol === fromCrypto) && cryptoData.find(c => c.symbol === toCrypto) ? 
+                      (cryptoData.find(c => c.symbol === fromCrypto)!.price / cryptoData.find(c => c.symbol === toCrypto)!.price).toFixed(4) : 
+                      '0.00'
+                    } {toCrypto}
                   </div>
+                  
+                  {showToSelect && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-2xl p-2 z-10 max-h-60 overflow-y-auto">
+                      {cryptoData.filter(c => c.symbol !== fromCrypto).map((crypto) => (
+                        <button
+                          key={crypto.symbol}
+                          onClick={() => {
+                            setToCrypto(crypto.symbol);
+                            setShowToSelect(false);
+                          }}
+                          className="w-full flex items-center justify-between p-3 hover:bg-secondary/50 rounded-xl transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-purple-900/30 flex items-center justify-center">
+                              <span className="text-sm font-bold text-primary">{crypto.symbol[0]}</span>
+                            </div>
+                            <div className="text-left">
+                              <div className="text-white font-medium text-sm">{crypto.name}</div>
+                              <div className="text-gray-400 text-xs">{crypto.amount} {crypto.symbol}</div>
+                            </div>
+                          </div>
+                          <div className="text-white text-sm">${crypto.price.toLocaleString()}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </Card>
 
                 <Card className="bg-secondary/50 border-border p-4 rounded-2xl">
@@ -281,7 +395,12 @@ export default function Index() {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-400">Обменный курс</span>
-                    <span className="text-white font-medium">1 BTC = 18.9 ETH</span>
+                    <span className="text-white font-medium">
+                      1 {fromCrypto} = {cryptoData.find(c => c.symbol === fromCrypto) && cryptoData.find(c => c.symbol === toCrypto) ? 
+                        (cryptoData.find(c => c.symbol === fromCrypto)!.price / cryptoData.find(c => c.symbol === toCrypto)!.price).toFixed(4) : 
+                        '0.00'
+                      } {toCrypto}
+                    </span>
                   </div>
                 </Card>
 
