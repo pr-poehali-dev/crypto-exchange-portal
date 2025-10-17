@@ -38,6 +38,25 @@ export default function Index() {
     });
   };
 
+  const handleExchange = () => {
+    if (!exchangeAmount || parseFloat(exchangeAmount) <= 0) return;
+    
+    toast({
+      title: '✅ Обмен выполнен!',
+      description: `Вы обменяли ${exchangeAmount} BTC на ${(parseFloat(exchangeAmount) * 18.9).toFixed(4)} ETH`,
+      duration: 3000,
+    });
+    setExchangeAmount('');
+  };
+
+  const handleInProgress = (feature: string) => {
+    toast({
+      title: '🚧 Идёт работа',
+      description: `Раздел "${feature}" находится в разработке`,
+      duration: 2500,
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-[#1a1535]">
       <div className="max-w-md mx-auto pb-6">
@@ -267,6 +286,7 @@ export default function Index() {
                 </Card>
 
                 <Button 
+                  onClick={handleExchange}
                   className="w-full bg-primary hover:bg-primary/90 text-white h-14 rounded-2xl font-semibold text-base shadow-lg shadow-primary/30"
                   disabled={!exchangeAmount || parseFloat(exchangeAmount) <= 0}
                 >
@@ -303,7 +323,10 @@ export default function Index() {
               </Card>
 
               <div className="space-y-2">
-                <Card className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer">
+                <Card 
+                  className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer"
+                  onClick={() => handleInProgress('Безопасность')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -315,7 +338,10 @@ export default function Index() {
                   </div>
                 </Card>
 
-                <Card className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer">
+                <Card 
+                  className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer"
+                  onClick={() => handleInProgress('Уведомления')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -327,7 +353,10 @@ export default function Index() {
                   </div>
                 </Card>
 
-                <Card className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer">
+                <Card 
+                  className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer"
+                  onClick={() => handleInProgress('Поддержка')}
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
