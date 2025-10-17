@@ -44,11 +44,14 @@ export default function Index() {
         <div className="p-6 pt-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <img 
-                src="https://cdn.poehali.dev/files/6d7c86ba-3290-48b5-9fa0-1cd9608f67d9.png" 
-                alt="MutagenFinance Logo" 
-                className="w-14 h-14 object-contain"
-              />
+              <div className="relative">
+                <div className="absolute inset-0 w-14 h-14 rounded-full bg-purple-950"></div>
+                <img 
+                  src="https://cdn.poehali.dev/files/6d7c86ba-3290-48b5-9fa0-1cd9608f67d9.png" 
+                  alt="MutagenFinance Logo" 
+                  className="w-14 h-14 object-contain relative z-10"
+                />
+              </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">MutagenFinance</h1>
               </div>
