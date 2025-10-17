@@ -25,6 +25,7 @@ export default function Index() {
   const [toCrypto, setToCrypto] = useState('TRT');
   const [showFromSelect, setShowFromSelect] = useState(false);
   const [showToSelect, setShowToSelect] = useState(false);
+  const [pizzaCount, setPizzaCount] = useState(0);
   const [cryptoData, setCryptoData] = useState<CryptoType[]>([
     { symbol: 'SHRD', name: 'ShredorCoin', price: 43250.50, change: 2.45, amount: 0.15 },
     { symbol: 'TRT', name: 'TortleMoney', price: 2280.30, change: -1.23, amount: 0.5 },
@@ -42,9 +43,10 @@ export default function Index() {
   }, []);
 
   const handlePizzaOrder = () => {
+    setPizzaCount(prev => prev + 1);
     toast({
       title: '🍕 Пицца заказана!',
-      description: 'Ваш заказ принят и скоро будет доставлен.',
+      description: `Ваш заказ принят и скоро будет доставлен. Всего: ${pizzaCount + 1}/150`,
       duration: 3000,
     });
   };
@@ -114,7 +116,12 @@ export default function Index() {
                 <h1 className="text-2xl font-bold text-white">MutagenFinance</h1>
               </div>
             </div>
-            <Button variant="ghost" size="icon" className="text-gray-400">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400"
+              onClick={() => handleInProgress('Настройки')}
+            >
               <Icon name="Settings" size={24} />
             </Button>
           </div>
@@ -418,6 +425,34 @@ export default function Index() {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white mb-6">Профиль</h2>
+
+              <Card className="bg-gradient-to-br from-orange-500/20 to-orange-900/20 border-orange-500/30 p-6 rounded-3xl mb-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                      <span className="text-3xl">🍕</span>
+                    </div>
+                    <div>
+                      <div className="text-white font-bold text-lg">Задание: Заказать 150 пицц</div>
+                      <div className="text-gray-400 text-sm">Прогресс: {pizzaCount}/150</div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-orange-500">{Math.floor((pizzaCount / 150) * 100)}%</div>
+                  </div>
+                </div>
+                <div className="w-full bg-secondary/50 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-full transition-all duration-500"
+                    style={{ width: `${Math.min((pizzaCount / 150) * 100, 100)}%` }}
+                  />
+                </div>
+                {pizzaCount >= 150 && (
+                  <div className="mt-4 text-center text-orange-500 font-bold">
+                    ✅ Задание выполнено!
+                  </div>
+                )}
+              </Card>
 
               <Card className="bg-gradient-to-br from-card to-[#1e1640] border-border p-6 rounded-3xl">
                 <div className="flex items-center gap-4 mb-6">
