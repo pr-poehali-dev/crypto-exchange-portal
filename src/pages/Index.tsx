@@ -26,6 +26,10 @@ export default function Index() {
   const [showFromSelect, setShowFromSelect] = useState(false);
   const [showToSelect, setShowToSelect] = useState(false);
   const [pizzaCount, setPizzaCount] = useState(0);
+  const [exchangeCount, setExchangeCount] = useState(0);
+  const [buyCount, setBuyCount] = useState(0);
+  const [selectedBuyCrypto, setSelectedBuyCrypto] = useState<string | null>(null);
+  const [buyAmount, setBuyAmount] = useState('');
   const [cryptoData, setCryptoData] = useState<CryptoType[]>([
     { symbol: 'SHRD', name: 'ShredorCoin', price: 43250.50, change: 2.45, amount: 0.15 },
     { symbol: 'TRT', name: 'TortleMoney', price: 2280.30, change: -1.23, amount: 0.5 },
@@ -43,12 +47,25 @@ export default function Index() {
   }, []);
 
   const handlePizzaOrder = () => {
-    setPizzaCount(prev => prev + 1);
-    toast({
-      title: '🍕 Пицца заказана!',
-      description: `Ваш заказ принят и скоро будет доставлен. Всего: ${pizzaCount + 1}/150`,
-      duration: 3000,
-    });
+    const newCount = pizzaCount + 1;
+    setPizzaCount(newCount);
+    
+    if (newCount === 150) {
+      setCryptoData(prev => prev.map(coin => 
+        coin.symbol === 'LEO' ? { ...coin, amount: coin.amount + 500 } : coin
+      ));
+      toast({
+        title: '🎉 Задание выполнено!',
+        description: 'Вы получили 500 LeoCoin за заказ 150 пицц!',
+        duration: 4000,
+      });
+    } else {
+      toast({
+        title: '🍕 Пицца заказана!',
+        description: `Ваш заказ принят и скоро будет доставлен. Всего: ${newCount}/150`,
+        duration: 3000,
+      });
+    }
   };
 
   const handleExchange = () => {
@@ -82,11 +99,25 @@ export default function Index() {
       return coin;
     }));
     
-    toast({
-      title: '✅ Обмен выполнен!',
-      description: `Вы обменяли ${amount} ${fromCrypto} на ${receivedAmount.toFixed(4)} ${toCrypto}`,
-      duration: 3000,
-    });
+    const newExchangeCount = exchangeCount + 1;
+    setExchangeCount(newExchangeCount);
+    
+    if (newExchangeCount === 10) {
+      setCryptoData(prev => prev.map(coin => 
+        coin.symbol === 'DNYA' ? { ...coin, amount: coin.amount + 0.5 } : coin
+      ));
+      toast({
+        title: '🎉 Задание выполнено!',
+        description: 'Вы получили 0.5 DanyaKazyk за 10 обменов!',
+        duration: 4000,
+      });
+    } else {
+      toast({
+        title: '✅ Обмен выполнен!',
+        description: `Вы обменяли ${amount} ${fromCrypto} на ${receivedAmount.toFixed(4)} ${toCrypto}`,
+        duration: 3000,
+      });
+    }
     setExchangeAmount('');
   };
 
@@ -96,6 +127,49 @@ export default function Index() {
       description: `Раздел "${feature}" находится в разработке`,
       duration: 2500,
     });
+  };
+
+  const handleBuyCrypto = (symbol: string) => {
+    setSelectedBuyCrypto(symbol);
+    setBuyAmount('');
+  };
+
+  const confirmBuy = () => {
+    if (!selectedBuyCrypto || !buyAmount || parseFloat(buyAmount) <= 0) return;
+    
+    const crypto = cryptoData.find(c => c.symbol === selectedBuyCrypto);
+    if (!crypto) return;
+    
+    const amount = parseFloat(buyAmount);
+    
+    setCryptoData(prev => prev.map(coin => 
+      coin.symbol === selectedBuyCrypto 
+        ? { ...coin, amount: coin.amount + amount } 
+        : coin
+    ));
+    
+    const newBuyCount = buyCount + 1;
+    setBuyCount(newBuyCount);
+    
+    if (newBuyCount === 5) {
+      setCryptoData(prev => prev.map(coin => 
+        coin.symbol === 'MKKY' ? { ...coin, amount: coin.amount + 5 } : coin
+      ));
+      toast({
+        title: '🎉 Задание выполнено!',
+        description: 'Вы получили 5 MikkyToken за 5 покупок!',
+        duration: 4000,
+      });
+    } else {
+      toast({
+        title: '✅ Покупка выполнена!',
+        description: `Вы купили ${amount} ${selectedBuyCrypto}`,
+        duration: 3000,
+      });
+    }
+    
+    setSelectedBuyCrypto(null);
+    setBuyAmount('');
   };
 
   return (
@@ -257,7 +331,7 @@ export default function Index() {
                 {cryptoData.map((crypto) => (
                   <Card
                     key={crypto.symbol}
-                    className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors cursor-pointer"
+                    className="bg-card border-border p-4 rounded-2xl hover:bg-card/80 transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -269,16 +343,93 @@ export default function Index() {
                           <div className="text-sm text-gray-400">{crypto.symbol}</div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-semibold text-white">${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
-                        <div className={`text-sm ${crypto.change >= 0 ? 'text-primary' : 'text-red-400'}`}>
-                          {crypto.change >= 0 ? '+' : ''}{crypto.change}%
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="font-semibold text-white">${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                          <div className={`text-sm ${crypto.change >= 0 ? 'text-primary' : 'text-red-400'}`}>
+                            {crypto.change >= 0 ? '+' : ''}{crypto.change}%
+                          </div>
                         </div>
+                        <Button 
+                          onClick={() => handleBuyCrypto(crypto.symbol)}
+                          size="sm"
+                          className="bg-primary hover:bg-primary/90 text-white"
+                        >
+                          Купить
+                        </Button>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
+              
+              {selectedBuyCrypto && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                  <Card className="bg-card border-border p-6 rounded-3xl max-w-md w-full">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold text-white">
+                        Купить {cryptoData.find(c => c.symbol === selectedBuyCrypto)?.name}
+                      </h3>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => setSelectedBuyCrypto(null)}
+                        className="text-gray-400 hover:text-white"
+                      >
+                        <Icon name="X" size={24} />
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm text-gray-400 mb-2 block">Количество</label>
+                        <input
+                          type="number"
+                          value={buyAmount}
+                          onChange={(e) => setBuyAmount(e.target.value)}
+                          placeholder="0.00"
+                          className="w-full bg-secondary border border-border rounded-xl p-4 text-white text-lg font-semibold outline-none focus:border-primary transition-colors"
+                        />
+                      </div>
+                      
+                      <div className="bg-secondary/50 rounded-xl p-4">
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-gray-400">Цена за 1 {selectedBuyCrypto}</span>
+                          <span className="text-white font-medium">
+                            ${cryptoData.find(c => c.symbol === selectedBuyCrypto)?.price.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-400">Итого</span>
+                          <span className="text-white font-bold">
+                            ${buyAmount && cryptoData.find(c => c.symbol === selectedBuyCrypto) ? 
+                              (parseFloat(buyAmount) * cryptoData.find(c => c.symbol === selectedBuyCrypto)!.price).toLocaleString('en-US', { minimumFractionDigits: 2 }) : 
+                              '0.00'
+                            }
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-3">
+                        <Button 
+                          onClick={() => setSelectedBuyCrypto(null)}
+                          variant="outline"
+                          className="flex-1 border-border text-white hover:bg-secondary"
+                        >
+                          Отмена
+                        </Button>
+                        <Button 
+                          onClick={confirmBuy}
+                          className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                          disabled={!buyAmount || parseFloat(buyAmount) <= 0}
+                        >
+                          Подтвердить
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              )}
             </div>
           )}
 
@@ -426,33 +577,91 @@ export default function Index() {
             <div className="space-y-6">
               <h2 className="text-2xl font-bold text-white mb-6">Профиль</h2>
 
-              <Card className="bg-gradient-to-br from-orange-500/20 to-orange-900/20 border-orange-500/30 p-6 rounded-3xl mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
-                      <span className="text-3xl">🍕</span>
+              <div className="space-y-4">
+                <Card className="bg-gradient-to-br from-orange-500/20 to-orange-900/20 border-orange-500/30 p-6 rounded-3xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center">
+                        <span className="text-3xl">🍕</span>
+                      </div>
+                      <div>
+                        <div className="text-white font-bold text-lg">Заказать 150 пицц</div>
+                        <div className="text-gray-400 text-sm">{pizzaCount}/150 • Награда: 500 LEO</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-white font-bold text-lg">Задание: Заказать 150 пицц</div>
-                      <div className="text-gray-400 text-sm">Прогресс: {pizzaCount}/150</div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-orange-500">{Math.floor((pizzaCount / 150) * 100)}%</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-orange-500">{Math.floor((pizzaCount / 150) * 100)}%</div>
+                  <div className="w-full bg-secondary/50 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-orange-500 to-orange-600 h-full transition-all duration-500"
+                      style={{ width: `${Math.min((pizzaCount / 150) * 100, 100)}%` }}
+                    />
                   </div>
-                </div>
-                <div className="w-full bg-secondary/50 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-orange-500 to-orange-600 h-full transition-all duration-500"
-                    style={{ width: `${Math.min((pizzaCount / 150) * 100, 100)}%` }}
-                  />
-                </div>
-                {pizzaCount >= 150 && (
-                  <div className="mt-4 text-center text-orange-500 font-bold">
-                    ✅ Задание выполнено!
+                  {pizzaCount >= 150 && (
+                    <div className="mt-4 text-center text-orange-500 font-bold">
+                      ✅ Задание выполнено!
+                    </div>
+                  )}
+                </Card>
+
+                <Card className="bg-gradient-to-br from-primary/20 to-purple-900/20 border-primary/30 p-6 rounded-3xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                        <Icon name="ArrowLeftRight" size={24} className="text-primary" />
+                      </div>
+                      <div>
+                        <div className="text-white font-bold text-lg">Сделать 10 обменов</div>
+                        <div className="text-gray-400 text-sm">{exchangeCount}/10 • Награда: 0.5 DNYA</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">{Math.floor((exchangeCount / 10) * 100)}%</div>
+                    </div>
                   </div>
-                )}
-              </Card>
+                  <div className="w-full bg-secondary/50 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-primary to-purple-600 h-full transition-all duration-500"
+                      style={{ width: `${Math.min((exchangeCount / 10) * 100, 100)}%` }}
+                    />
+                  </div>
+                  {exchangeCount >= 10 && (
+                    <div className="mt-4 text-center text-primary font-bold">
+                      ✅ Задание выполнено!
+                    </div>
+                  )}
+                </Card>
+
+                <Card className="bg-gradient-to-br from-green-500/20 to-green-900/20 border-green-500/30 p-6 rounded-3xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center">
+                        <Icon name="ShoppingCart" size={24} className="text-green-500" />
+                      </div>
+                      <div>
+                        <div className="text-white font-bold text-lg">Купить 5 криптовалют</div>
+                        <div className="text-gray-400 text-sm">{buyCount}/5 • Награда: 5 MKKY</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-green-500">{Math.floor((buyCount / 5) * 100)}%</div>
+                    </div>
+                  </div>
+                  <div className="w-full bg-secondary/50 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-green-500 to-green-600 h-full transition-all duration-500"
+                      style={{ width: `${Math.min((buyCount / 5) * 100, 100)}%` }}
+                    />
+                  </div>
+                  {buyCount >= 5 && (
+                    <div className="mt-4 text-center text-green-500 font-bold">
+                      ✅ Задание выполнено!
+                    </div>
+                  )}
+                </Card>
+              </div>
 
               <Card className="bg-gradient-to-br from-card to-[#1e1640] border-border p-6 rounded-3xl">
                 <div className="flex items-center gap-4 mb-6">
