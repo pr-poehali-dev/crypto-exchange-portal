@@ -44,9 +44,11 @@ export default function Index() {
         <div className="p-6 pt-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary to-purple-700 flex items-center justify-center">
-                <Icon name="TrendingUp" size={28} className="text-white" />
-              </div>
+              <img 
+                src="https://cdn.poehali.dev/files/6d7c86ba-3290-48b5-9fa0-1cd9608f67d9.png" 
+                alt="MutagenFinance Logo" 
+                className="w-14 h-14 object-contain"
+              />
               <div>
                 <h1 className="text-2xl font-bold text-white">MutagenFinance</h1>
               </div>
