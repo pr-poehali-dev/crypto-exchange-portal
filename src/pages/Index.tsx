@@ -1,23 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useToast } from '@/hooks/use-toast';
 
 const cryptoData = [
-  { symbol: 'BTC', name: 'Bitcoin', price: 43250.50, change: 2.45, amount: 0.15 },
-  { symbol: 'ETH', name: 'Ethereum', price: 2280.30, change: -1.23, amount: 0.5 },
-  { symbol: 'TON', name: 'Toncoin', price: 2.45, change: 5.67, amount: 1250 },
-  { symbol: 'USDT', name: 'Tether', price: 1.00, change: 0.01, amount: 5000 },
-  { symbol: 'BNB', name: 'BNB', price: 312.80, change: 3.21, amount: 2.5 },
-  { symbol: 'SOL', name: 'Solana', price: 98.50, change: -2.15, amount: 10 },
+  { symbol: 'SHRD', name: 'ShredorCoin', price: 43250.50, change: 2.45, amount: 0.15 },
+  { symbol: 'TRT', name: 'TortleMoney', price: 2280.30, change: -1.23, amount: 0.5 },
+  { symbol: 'LEO', name: 'LeoCoin', price: 2.45, change: 5.67, amount: 1250 },
+  { symbol: 'RAPH', name: 'RaphToken', price: 1.00, change: 0.01, amount: 5000 },
+  { symbol: 'DONY', name: 'DonyMoney', price: 312.80, change: 3.21, amount: 2.5 },
+  { symbol: 'MKKY', name: 'MikkyToken', price: 98.50, change: -2.15, amount: 10 },
 ];
+
+const getRandomBalance = () => {
+  return (Math.random() * (19482.49 - 1583.49) + 1583.49);
+};
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState('main');
   const [exchangeAmount, setExchangeAmount] = useState('');
-
-  const totalBalance = cryptoData.reduce((sum, coin) => sum + (coin.price * coin.amount), 0);
+  const [totalBalance, setTotalBalance] = useState(0);
+  const { toast } = useToast();
   const balanceChange = 6.18;
+
+  useEffect(() => {
+    setTotalBalance(getRandomBalance());
+  }, []);
+
+  const handlePizzaOrder = () => {
+    toast({
+      title: '🍕 Пицца заказана!',
+      description: 'Ваш заказ принят и скоро будет доставлен.',
+      duration: 3000,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background to-[#1a1535]">
@@ -108,7 +125,7 @@ export default function Index() {
                   <Icon name="ArrowLeftRight" size={24} className="text-white" />
                   <span className="text-white font-medium">Обменять</span>
                 </Button>
-                <Button className="h-auto py-6 bg-orange-500 hover:bg-orange-600 rounded-2xl flex flex-col items-center gap-2 shadow-lg shadow-orange-500/30">
+                <Button onClick={handlePizzaOrder} className="h-auto py-6 bg-orange-500 hover:bg-orange-600 rounded-2xl flex flex-col items-center gap-2 shadow-lg shadow-orange-500/30">
                   <span className="text-3xl">🍕</span>
                   <span className="text-white font-medium">Пицца</span>
                 </Button>
@@ -128,7 +145,7 @@ export default function Index() {
                             <span className="text-xl font-bold text-primary">{crypto.symbol[0]}</span>
                           </div>
                           <div>
-                            <div className="font-semibold text-white">{crypto.symbol === 'BTC' ? 'ShredorCoin' : 'LeoMoney'}</div>
+                            <div className="font-semibold text-white">{crypto.name}</div>
                             <div className="text-sm text-gray-400">{crypto.amount} {crypto.symbol}</div>
                           </div>
                         </div>
@@ -167,8 +184,8 @@ export default function Index() {
                           <span className="text-xl font-bold text-primary">{crypto.symbol[0]}</span>
                         </div>
                         <div>
-                          <div className="font-semibold text-white">{crypto.symbol}</div>
-                          <div className="text-sm text-gray-400">{crypto.name}</div>
+                          <div className="font-semibold text-white">{crypto.name}</div>
+                          <div className="text-sm text-gray-400">{crypto.symbol}</div>
                         </div>
                       </div>
                       <div className="text-right">
